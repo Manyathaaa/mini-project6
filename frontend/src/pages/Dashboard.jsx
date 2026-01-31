@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getProfile } from '../services/authService';
+import { useNavigate, Link } from 'react-router-dom';
+import { getProfile, logout } from '../services/authService';
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
@@ -24,8 +24,8 @@ export default function Dashboard() {
     })();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 
@@ -51,12 +51,32 @@ export default function Dashboard() {
           Logout
         </button>
       </div>
-      <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '4px' }}>
+      <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '4px', marginBottom: '20px' }}>
         <p><strong>Name:</strong> {profile.name}</p>
         <p><strong>Email:</strong> {profile.email}</p>
         <p><strong>Role:</strong> {profile.role}</p>
         <p><strong>User ID:</strong> {profile._id}</p>
         <p><strong>Created:</strong> {new Date(profile.createdAt).toLocaleString()}</p>
+      </div>
+      
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <Link 
+          to="/sessions" 
+          style={{ 
+            display: 'inline-block',
+            padding: '10px 20px', 
+            backgroundColor: '#007bff', 
+            color: 'white', 
+            textDecoration: 'none', 
+            borderRadius: '4px',
+            fontWeight: 'bold'
+          }}
+        >
+          🔐 Manage Active Sessions
+        </Link>
+        <p style={{ marginTop: '10px', fontSize: '0.9em', color: '#666' }}>
+          View and manage devices where you're logged in
+        </p>
       </div>
     </div>
   );

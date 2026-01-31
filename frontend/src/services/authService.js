@@ -8,7 +8,12 @@ export async function register(payload) {
       body: JSON.stringify(payload),
     });
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      // Store both token and sessionId
+      if (data.sessionId) {
+        localStorage.setItem('sessionId', data.sessionId);
+      }
+      return data;
     }
     const error = await res.json();
     console.error('Registration error:', error);
@@ -27,7 +32,12 @@ export async function login(payload) {
       body: JSON.stringify(payload),
     });
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      // Store both token and sessionId
+      if (data.sessionId) {
+        localStorage.setItem('sessionId', data.sessionId);
+      }
+      return data;
     }
     const error = await res.json();
     console.error('Login error:', error);
@@ -35,6 +45,30 @@ export async function login(payload) {
   } catch (err) {
     console.error('Network error:', err);
     return null;
+  }
+}
+
+export async function logout() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return true;
+    
+    const res = await fetch(`${API}/api/auth/logout`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    
+    // Clear local storage regardless of response
+    localStorage.removeItem('token');
+    localStorage.removeItem('sessionId');
+    
+    return res.ok;
+  } catch (err) {
+    console.error('Logout error:', err);
+    // Still clear local storage
+    localStorage.removeItem('token');
+    localStorage.removeItem('sessionId');
+    return false;
   }
 }
 
@@ -53,9 +87,62 @@ export async function getProfile() {
     }
     const error = await res.json();
     console.error('Profile error:', error);
+    
+    // If session is invalid, clear storage
+    if (res.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('sessionId');
+    }
     return null;
   } catch (err) {
     console.error('Network error:', err);
+    return null;
+  }
+}
+
+export async function getActiveSessions() {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API}/api/sessions/active`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+    return null;
+  } catch (err) {
+    console.error('Error fetching sessions:', err);
+    return null;
+  }
+}
+
+export async function revokeSession(sessionId) {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API}/api/sessions/${sessionId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('Error revoking session:', err);
+    return false;
+  }
+}
+
+export async function revokeAllOtherSessions() {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API}/api/sessions/revoke-all`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+    return null;
+  } catch (err) {
+    console.error('Error revoking sessions:', err);
     return null;
   }
 }
