@@ -96,8 +96,8 @@ exports.login = async (req, res) => {
 };
 
 exports.getProfile = async (req, res) => {
-  const user = await User.findById(req.user.id).select('-password');
-  if (user) return res.json(user);
+  // req.user is already the full user object (without password) from sessionMiddleware
+  if (req.user) return res.json(req.user);
   res.status(404).json({ message: 'User not found' });
 };
 
