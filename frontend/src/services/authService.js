@@ -109,36 +109,52 @@ export async function getProfile() {
 export async function getActiveSessions() {
   try {
     const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found');
+      throw new Error('Not authenticated');
+    }
     const res = await fetch(`${API}/api/sessions/active`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) {
       return await res.json();
     }
-    return null;
+    const error = await res.json();
+    console.error('Error fetching sessions:', error);
+    throw new Error(error.message || 'Failed to fetch sessions');
   } catch (err) {
     console.error('Error fetching sessions:', err);
-    return null;
+    throw err;
   }
 }
 
 export async function revokeSession(sessionId) {
   try {
     const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
     const res = await fetch(`${API}/api/sessions/${sessionId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
-    return res.ok;
+    if (res.ok) {
+      return true;
+    }
+    const error = await res.json();
+    throw new Error(error.message || 'Failed to revoke session');
   } catch (err) {
     console.error('Error revoking session:', err);
-    return false;
+    throw err;
   }
 }
 
 export async function revokeAllOtherSessions() {
   try {
     const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
     const res = await fetch(`${API}/api/sessions/revoke-all`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
@@ -146,9 +162,10 @@ export async function revokeAllOtherSessions() {
     if (res.ok) {
       return await res.json();
     }
-    return null;
+    const error = await res.json();
+    throw new Error(error.message || 'Failed to revoke sessions');
   } catch (err) {
-    console.error('Error revoking sessions:', err);
-    return null;
+    console.error('Error revoking all sessions:', err);
+    throw err;
   }
 }

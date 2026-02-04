@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getActiveSessions, revokeSession, revokeAllOtherSessions } from '../services/authService';
 
@@ -8,46 +8,55 @@ export default function Sessions() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const loadSessions = async () => {
+  const loadSessions = useCallback(async () => {
     setLoading(true);
+    setError('');
     try {
       const data = await getActiveSessions();
       if (data && data.sessions) {
         setSessions(data.sessions);
       } else {
-        setError('Failed to load sessions');
+        setError('No sessions data received');
       }
     } catch (err) {
-      setError('Error loading sessions');
-      console.error(err);
+      const errorMessage = err.message || 'Error loading sessions';
+      setError(errorMessage);
+      console.error('Sessions error:', err);
+      
+      // If not authenticated, redirect to login
+      if (errorMessage.includes('Not authenticated') || errorMessage.includes('401')) {
+        setTimeout(() => navigate('/login'), 2000);
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
     loadSessions();
-  }, []);
+  }, [loadSessions]);
 
   const handleRevokeSession = async (sessionId) => {
     if (window.confirm('Are you sure you want to revoke this session?')) {
-      const success = await revokeSession(sessionId);
-      if (success) {
+      try {
+        await revokeSession(sessionId);
         await loadSessions();
-      } else {
-        alert('Failed to revoke session');
+      } catch (err) {
+        alert(`Failed to revoke session: ${err.message}`);
       }
     }
   };
 
   const handleRevokeAllOther = async () => {
     if (window.confirm('This will log out all other devices. Continue?')) {
-      const result = await revokeAllOtherSessions();
-      if (result) {
-        alert(`${result.count} session(s) revoked successfully`);
+      try {
+        const result = await revokeAllOtherSessions();
+        if (result && result.count !== undefined) {
+          alert(`${result.count} session(s) revoked successfully`);
+        }
         await loadSessions();
-      } else {
-        alert('Failed to revoke sessions');
+      } catch (err) {
+        alert(`Failed to revoke sessions: ${err.message}`);
       }
     }
   };
