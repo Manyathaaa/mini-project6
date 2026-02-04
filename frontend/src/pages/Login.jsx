@@ -17,14 +17,13 @@ export default function Login() {
     try {
       const data = await login({ email, password });
       if (data && data.token) {
-        localStorage.setItem('token', data.token);
         console.log('Login successful:', data);
         navigate('/dashboard');
       } else {
         setError('Login failed. Please check your credentials.');
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(err.message || 'An error occurred. Please try again.');
       console.error('Login error:', err);
     } finally {
       setLoading(false);

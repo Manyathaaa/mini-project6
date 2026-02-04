@@ -18,14 +18,13 @@ export default function Register() {
     try {
       const data = await register({ name, email, password });
       if (data && data.token) {
-        localStorage.setItem('token', data.token);
         console.log('Registration successful:', data);
         navigate('/dashboard');
       } else {
         setError('Registration failed. Email may already exist.');
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(err.message || 'An error occurred. Please try again.');
       console.error('Registration error:', err);
     } finally {
       setLoading(false);

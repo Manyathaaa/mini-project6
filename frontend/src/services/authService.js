@@ -10,6 +10,9 @@ export async function register(payload) {
     if (res.ok) {
       const data = await res.json();
       // Store both token and sessionId
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       if (data.sessionId) {
         localStorage.setItem('sessionId', data.sessionId);
       }
@@ -17,10 +20,10 @@ export async function register(payload) {
     }
     const error = await res.json();
     console.error('Registration error:', error);
-    return null;
+    throw new Error(error.message || 'Registration failed');
   } catch (err) {
     console.error('Network error:', err);
-    return null;
+    throw err;
   }
 }
 
@@ -34,6 +37,9 @@ export async function login(payload) {
     if (res.ok) {
       const data = await res.json();
       // Store both token and sessionId
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       if (data.sessionId) {
         localStorage.setItem('sessionId', data.sessionId);
       }
@@ -41,10 +47,10 @@ export async function login(payload) {
     }
     const error = await res.json();
     console.error('Login error:', error);
-    return null;
+    throw new Error(error.message || 'Login failed');
   } catch (err) {
     console.error('Network error:', err);
-    return null;
+    throw err;
   }
 }
 
