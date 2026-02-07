@@ -117,13 +117,46 @@ export default function Sessions() {
                       <strong>Device:</strong> {session.deviceInfo.device}
                     </p>
                     <p style={{ margin: '5px 0' }}>
+                      <strong>Browser:</strong> {session.deviceInfo.browser}
+                    </p>
+                    <p style={{ margin: '5px 0' }}>
+                      <strong>Operating System:</strong> {session.deviceInfo.os}
+                    </p>
+                    <p style={{ margin: '5px 0' }}>
                       <strong>IP Address:</strong> {session.ipAddress}
                     </p>
+                    {session.userAgent && (
+                      <p style={{ margin: '5px 0' }}>
+                        <strong>User Agent:</strong> <span style={{ fontSize: '0.8em', color: '#999' }}>{session.userAgent}</span>
+                      </p>
+                    )}
+                    {(session.location?.country || session.location?.state || session.location?.city) && (
+                      <div style={{ margin: '5px 0' }}>
+                        <strong>Location:</strong>
+                        <div style={{ paddingLeft: '20px', marginTop: '5px' }}>
+                          {session.location.country && <p style={{ margin: '3px 0' }}>🌍 Country: {session.location.country}</p>}
+                          {session.location.state && <p style={{ margin: '3px 0' }}>📍 State: {session.location.state}</p>}
+                          {session.location.city && <p style={{ margin: '3px 0' }}>🏙️ City: {session.location.city}</p>}
+                          {session.location.street && <p style={{ margin: '3px 0' }}>🛣️ Street/District: {session.location.street}</p>}
+                          {session.location.houseNumber && <p style={{ margin: '3px 0' }}>🏠 House Number: {session.location.houseNumber}</p>}
+                          {session.location.postalCode && <p style={{ margin: '3px 0' }}>📮 Postal Code: {session.location.postalCode}</p>}
+                          {session.location.latitude && session.location.longitude && (
+                            <p style={{ margin: '3px 0' }}>📌 Coordinates: {session.location.latitude}, {session.location.longitude}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     <p style={{ margin: '5px 0' }}>
                       <strong>Login Time:</strong> {new Date(session.loginTime).toLocaleString()}
                     </p>
                     <p style={{ margin: '5px 0' }}>
                       <strong>Last Activity:</strong> {new Date(session.lastActivity).toLocaleString()}
+                    </p>
+                    <p style={{ margin: '5px 0' }}>
+                      <strong>Expires At:</strong> {new Date(session.expiresAt).toLocaleString()}
+                    </p>
+                    <p style={{ margin: '5px 0' }}>
+                      <strong>Status:</strong> <span style={{ color: session.isActive ? '#28a745' : '#dc3545' }}>{session.isActive ? 'Active ✓' : 'Inactive'}</span>
                     </p>
                   </div>
                 </div>

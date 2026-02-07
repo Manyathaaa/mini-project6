@@ -32,7 +32,13 @@ const sessionSchema = new mongoose.Schema({
   },
   location: {
     country: String,
-    city: String
+    state: String,
+    city: String,
+    street: String,
+    houseNumber: String,
+    postalCode: String,
+    latitude: Number,
+    longitude: Number
   },
   loginTime: {
     type: Date,

@@ -8,14 +8,23 @@ exports.getActiveSessions = async (req, res) => {
       isActive: true
     }).sort({ lastActivity: -1 });
     
-    // Format response
+    // Format response with all session details
     const formattedSessions = sessions.map(session => ({
+      _id: session._id,
       sessionId: session.sessionId,
-      deviceInfo: session.deviceInfo,
+      token: session.token,
       ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+      deviceInfo: session.deviceInfo,
       location: session.location,
       loginTime: session.loginTime,
       lastActivity: session.lastActivity,
+      expiresAt: session.expiresAt,
+      isActive: session.isActive,
+      revokedAt: session.revokedAt,
+      revokedReason: session.revokedReason,
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt,
       isCurrent: session.sessionId === req.session.sessionId
     }));
     

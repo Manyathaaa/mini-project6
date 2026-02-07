@@ -14,8 +14,8 @@ exports.register = async (req, res) => {
     // Generate token with session
     const { token, sessionId } = generateToken(user._id);
     
-    // Get client info
-    const clientInfo = getClientInfo(req);
+    // Get client info (now async)
+    const clientInfo = await getClientInfo(req);
     
     // Create session
     const session = await Session.create({
@@ -69,7 +69,7 @@ exports.login = async (req, res) => {
       
       // Generate new token and session
       const { token, sessionId } = generateToken(user._id);
-      const clientInfo = getClientInfo(req);
+      const clientInfo = await getClientInfo(req);
       
       // Create new session
       await Session.create({
