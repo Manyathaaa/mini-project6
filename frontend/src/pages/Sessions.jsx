@@ -111,6 +111,9 @@ export default function Sessions() {
                   </div>
                   <div style={{ fontSize: '0.9em', color: '#666' }}>
                     <p style={{ margin: '5px 0' }}>
+                      <strong>Session ID:</strong> <code style={{ backgroundColor: '#f4f4f4', padding: '2px 6px', borderRadius: '3px', fontSize: '0.85em' }}>{session.sessionId}</code>
+                    </p>
+                    <p style={{ margin: '5px 0' }}>
                       <strong>Device:</strong> {session.deviceInfo.device}
                     </p>
                     <p style={{ margin: '5px 0' }}>
