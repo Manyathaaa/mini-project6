@@ -34,21 +34,30 @@ const validateSession = async (req, res, next) => {
         return res.status(401).json({ message: 'Session expired' });
       }
       
-      // Get client info
-      const clientInfo = getClientInfo(req);
+      // Get client info (now async)
+      const clientInfo = await getClientInfo(req);
       
       // Session hijacking detection: Check IP and User-Agent
+      // For localhost/development, be more lenient
+      const isLocalhost = session.ipAddress === '::1' || 
+                         session.ipAddress.startsWith('127.') ||
+                         clientInfo.ipAddress === '::1' ||
+                         clientInfo.ipAddress.startsWith('127.');
+      
       const ipMismatch = session.ipAddress !== clientInfo.ipAddress;
       const uaMismatch = session.userAgent !== clientInfo.userAgent;
       
-      if (ipMismatch || uaMismatch) {
+      // Only block if BOTH IP and UA are different, or if it's not localhost
+      if (!isLocalhost && ipMismatch && uaMismatch) {
         console.warn('⚠️ Suspicious activity detected:', {
           userId: decoded.id,
           sessionId: decoded.sessionId,
           ipMismatch,
           uaMismatch,
           expectedIP: session.ipAddress,
-          actualIP: clientInfo.ipAddress
+          actualIP: clientInfo.ipAddress,
+          expectedUA: session.userAgent.substring(0, 50),
+          actualUA: clientInfo.userAgent.substring(0, 50)
         });
         
         // Mark session as suspicious (optional: revoke immediately)
@@ -60,6 +69,14 @@ const validateSession = async (req, res, next) => {
         return res.status(401).json({ 
           message: 'Suspicious activity detected. Session terminated for security.',
           reason: 'ip_or_device_mismatch'
+        });
+      }
+      
+      // Log mismatches but don't block for localhost
+      if (isLocalhost && (ipMismatch || uaMismatch)) {
+        console.log('ℹ️ Localhost mismatch (allowed):', {
+          ipMismatch,
+          uaMismatch
         });
       }
       

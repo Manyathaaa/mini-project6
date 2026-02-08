@@ -34,7 +34,16 @@ const getLocationFromIP = async (ipAddress) => {
     }
 
     // Using ip-api.com (free, no key required, 45 requests/minute)
-    const response = await fetch(`http://ip-api.com/json/${ipAddress}?fields=status,country,regionName,city,zip,lat,lon,district,query`);
+    // Add timeout to prevent hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    const response = await fetch(
+      `http://ip-api.com/json/${ipAddress}?fields=status,country,regionName,city,zip,lat,lon,district,query`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeoutId);
+    
     const data = await response.json();
     
     if (data.status === 'success') {
@@ -53,6 +62,7 @@ const getLocationFromIP = async (ipAddress) => {
     return {};
   } catch (error) {
     console.error('Error fetching location:', error.message);
+    // Return empty object on error, don't block registration
     return {};
   }
 };
