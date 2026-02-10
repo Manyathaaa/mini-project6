@@ -69,10 +69,25 @@ export default function Dashboard() {
             color: 'white', 
             textDecoration: 'none', 
             borderRadius: '4px',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            marginRight: '10px'
           }}
         >
           🔐 Manage Active Sessions
+        </Link>
+        <Link 
+          to="/history" 
+          style={{ 
+            display: 'inline-block',
+            padding: '10px 20px', 
+            backgroundColor: '#6c757d', 
+            color: 'white', 
+            textDecoration: 'none', 
+            borderRadius: '4px',
+            fontWeight: 'bold'
+          }}
+        >
+          📜 View Session History
         </Link>
         <p style={{ marginTop: '10px', fontSize: '0.9em', color: '#666' }}>
           View and manage devices where you're logged in
