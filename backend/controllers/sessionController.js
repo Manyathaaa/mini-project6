@@ -1,7 +1,7 @@
 const Session = require('../models/Session');
 
 // Get all active sessions for current user
-exports.getActiveSessions = async (req, res) => {
+exports.  getActiveSessions = async (req, res) => {
   try {
     const sessions = await Session.find({
       userId: req.user._id,
